@@ -21,6 +21,7 @@
 #include "cmsis_os.h"
 #include "iwdg.h"
 #include "usart.h"
+#include "wwdg.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -91,6 +92,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_IWDG_Init();
+  MX_WWDG_Init();
   /* USER CODE BEGIN 2 */
   /* USER CODE END 2 */
 
