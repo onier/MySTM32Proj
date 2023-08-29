@@ -19,7 +19,22 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "usart.h"
+uint8_t rxBuffer[10]; // 缓冲区用于存储接收的数据
+uint16_t rxIndex = 0; // 当前已接收的数据字节数
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+    if (huart == &huart1) {
+        if (rxIndex < sizeof(rxBuffer)) {
+            // 接收到一个字节的数据
+            rxBuffer[rxIndex++] = huart->Instance->DR;
+        } else {
+            HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
+        }
+
+        // 重新启动接收
+        HAL_UART_Receive_IT(&huart1, &rxBuffer[rxIndex], 1);
+    }
+}
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
