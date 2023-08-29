@@ -27,6 +27,19 @@
 UART_HandleTypeDef huart1;
 DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;
+#define RxBuf_size 10
+#define MainBuf_size 20
+
+uint8_t RxBuf[RxBuf_size];
+uint8_t MainBuf[MainBuf_size];
+
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
+    if (huart->Instance == USART1) {
+        memcpy(MainBuf, RxBuf, Size);
+        HAL_UARTEx_ReceiveToIdle_DMA(&huart1, RxBuf, RxBuf_size);
+        __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
+    }
+}
 
 /* USART1 init function */
 
@@ -53,6 +66,9 @@ void MX_USART1_UART_Init(void) {
     char * str = "uart1 was init sucess \n";
 //     HAL_UART_Transmit_DMA(&huart1, str, strlen(str));
     sendStr(str);
+
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart1, RxBuf, RxBuf_size);
+    __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
     /* USER CODE BEGIN USART1_Init 2 */
 
     /* USER CODE END USART1_Init 2 */
