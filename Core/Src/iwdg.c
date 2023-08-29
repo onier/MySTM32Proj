@@ -59,7 +59,7 @@ static int getReload(int ms, int prescaler) {
 void Task1(void *pvParameters) {
     while (1) {
         /* USER CODE END WHILE */
-        vTaskDelay(pdMS_TO_TICKS(2200));
+        vTaskDelay(pdMS_TO_TICKS(2000));
         HAL_IWDG_Refresh(&hiwdg);
         uint8_t rxBuffer[] = "Task1 Running \n";
         HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
@@ -69,7 +69,7 @@ void Task1(void *pvParameters) {
 void Task2(void *pvParameters) {
     while (1) {
         /* USER CODE END WHILE */
-        vTaskDelay(pdMS_TO_TICKS(2200));
+        vTaskDelay(pdMS_TO_TICKS(2000));
         HAL_IWDG_Refresh(&hiwdg);
         uint8_t rxBuffer[] = "Task2 Running \n";
         HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
@@ -89,7 +89,7 @@ void MX_IWDG_Init(void) {
     /* USER CODE END IWDG_Init 1 */
     hiwdg.Instance = IWDG;
     hiwdg.Init.Prescaler = IWDG_PRESCALER_64;
-    hiwdg.Init.Reload = getReload(1000,IWDG_PRESCALER_64);//1s的超时时间，两个任务可以共享看门狗，刷新周期会累加。下面两个task分别2.2秒刷新看门狗会导致超时出现。2.2/2>1
+    hiwdg.Init.Reload = getReload(1000,IWDG_PRESCALER_64);//1s的超时时间，两个任务可以共享看门狗，刷新周期会累加。下面两个task分别2秒刷新看门狗会导致超时出现。2/2>=1
     if (HAL_IWDG_Init(&hiwdg) != HAL_OK) {
         Error_Handler();
     }
