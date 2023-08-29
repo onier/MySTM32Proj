@@ -28,6 +28,7 @@
 
 IWDG_HandleTypeDef hiwdg;
 
+//固定的计算公式
 static int getReload(int ms, int prescaler) {
     switch (prescaler) {
         case IWDG_PRESCALER_4:
