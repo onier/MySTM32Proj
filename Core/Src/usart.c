@@ -25,19 +25,20 @@
 /* USER CODE END 0 */
 
 UART_HandleTypeDef huart1;
-DMA_HandleTypeDef hdma_usart1_rx;
-DMA_HandleTypeDef hdma_usart1_tx;
-#define RxBuf_size 10
-#define MainBuf_size 20
+uint8_t rxBuffer[10]; // 缓冲区用于存储接收的数据
+uint16_t rxIndex = 0; // 当前已接收的数据字节数
 
-uint8_t RxBuf[RxBuf_size];
-uint8_t MainBuf[MainBuf_size];
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+    if (huart == &huart1) {
+        if (rxIndex < sizeof(rxBuffer)) {
+            // 接收到一个字节的数据
+            rxBuffer[rxIndex++] = huart->Instance->DR;
+        } else {
+            HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
+        }
 
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
-    if (huart->Instance == USART1) {
-        memcpy(MainBuf, RxBuf, Size);
-        HAL_UARTEx_ReceiveToIdle_DMA(&huart1, RxBuf, RxBuf_size);
-        __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
+        // 重新启动接收
+        HAL_UART_Receive_IT(&huart1, &rxBuffer[rxIndex], 1);
     }
 }
 
@@ -63,14 +64,8 @@ void MX_USART1_UART_Init(void) {
     if (HAL_UART_Init(&huart1) != HAL_OK) {
         Error_Handler();
     }
-    char * str = "uart1 was init sucess \n";
-//     HAL_UART_Transmit_DMA(&huart1, str, strlen(str));
-    sendStr(str);
-
-    HAL_UARTEx_ReceiveToIdle_DMA(&huart1, RxBuf, RxBuf_size);
-    __HAL_DMA_DISABLE_IT(&hdma_usart1_rx, DMA_IT_HT);
     /* USER CODE BEGIN USART1_Init 2 */
-
+    HAL_UART_Receive_IT(&huart1, &rxBuffer[rxIndex], 1);
     /* USER CODE END USART1_Init 2 */
 
 }
@@ -97,41 +92,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef *uartHandle) {
         GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-        /* USART1 DMA Init */
-        /* USART1_RX Init */
-        hdma_usart1_rx.Instance = DMA2_Stream2;
-        hdma_usart1_rx.Init.Channel = DMA_CHANNEL_4;
-        hdma_usart1_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
-        hdma_usart1_rx.Init.PeriphInc = DMA_PINC_DISABLE;
-        hdma_usart1_rx.Init.MemInc = DMA_MINC_ENABLE;
-        hdma_usart1_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-        hdma_usart1_rx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-        hdma_usart1_rx.Init.Mode = DMA_NORMAL;
-        hdma_usart1_rx.Init.Priority = DMA_PRIORITY_LOW;
-        hdma_usart1_rx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-        if (HAL_DMA_Init(&hdma_usart1_rx) != HAL_OK) {
-            Error_Handler();
-        }
-
-        __HAL_LINKDMA(uartHandle, hdmarx, hdma_usart1_rx);
-
-        /* USART1_TX Init */
-        hdma_usart1_tx.Instance = DMA2_Stream7;
-        hdma_usart1_tx.Init.Channel = DMA_CHANNEL_4;
-        hdma_usart1_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
-        hdma_usart1_tx.Init.PeriphInc = DMA_PINC_DISABLE;
-        hdma_usart1_tx.Init.MemInc = DMA_MINC_ENABLE;
-        hdma_usart1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-        hdma_usart1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-        hdma_usart1_tx.Init.Mode = DMA_NORMAL;
-        hdma_usart1_tx.Init.Priority = DMA_PRIORITY_LOW;
-        hdma_usart1_tx.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
-        if (HAL_DMA_Init(&hdma_usart1_tx) != HAL_OK) {
-            Error_Handler();
-        }
-
-        __HAL_LINKDMA(uartHandle, hdmatx, hdma_usart1_tx);
-
         /* USART1 interrupt Init */
         HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
         HAL_NVIC_EnableIRQ(USART1_IRQn);
@@ -156,10 +116,6 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *uartHandle) {
         */
         HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9 | GPIO_PIN_10);
 
-        /* USART1 DMA DeInit */
-        HAL_DMA_DeInit(uartHandle->hdmarx);
-        HAL_DMA_DeInit(uartHandle->hdmatx);
-
         /* USART1 interrupt Deinit */
         HAL_NVIC_DisableIRQ(USART1_IRQn);
         /* USER CODE BEGIN USART1_MspDeInit 1 */
@@ -168,9 +124,6 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *uartHandle) {
     }
 }
 
-RET sendStr(char *str) {
-   return HAL_UART_Transmit_DMA(&huart1, str, strlen(str));
-}
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
