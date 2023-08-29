@@ -56,22 +56,22 @@ static int getReload(int ms, int prescaler) {
     return ms * 32000 / (4 * prescaler * 1000) - 1;
 }
 
-void Task1(void *pvParameters) {
+void IWDG_Task1(void *pvParameters) {
     while (1) {
         /* USER CODE END WHILE */
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(pdMS_TO_TICKS(1100));
         HAL_IWDG_Refresh(&hiwdg);
-        uint8_t rxBuffer[] = "Task1 Running \n";
+        uint8_t rxBuffer[] = "IWDG_Task1 Running \n";
         HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
     }
 }
 
-void Task2(void *pvParameters) {
+void IWDG_Task2(void *pvParameters) {
     while (1) {
         /* USER CODE END WHILE */
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(pdMS_TO_TICKS(1100));
         HAL_IWDG_Refresh(&hiwdg);
-        uint8_t rxBuffer[] = "Task2 Running \n";
+        uint8_t rxBuffer[] = "IWDG_Task2 Running \n";
         HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
     }
 }
@@ -93,8 +93,8 @@ void MX_IWDG_Init(void) {
     if (HAL_IWDG_Init(&hiwdg) != HAL_OK) {
         Error_Handler();
     }
-    xTaskCreate(Task1, "Task1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(Task2, "Task2", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(IWDG_Task1, "IWDG_Task1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(IWDG_Task2, "IWDG_Task2", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
 
     // 启动调度器
     vTaskStartScheduler();
