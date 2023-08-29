@@ -27,7 +27,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+#include "cstring.h"
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -40,6 +40,7 @@ extern UART_HandleTypeDef huart1;
 
 void MX_USART1_UART_Init(void);
 
+RET sendStr(char *str);
 /* USER CODE BEGIN Prototypes */
 
 /* USER CODE END Prototypes */

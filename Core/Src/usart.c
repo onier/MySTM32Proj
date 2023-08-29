@@ -50,6 +50,9 @@ void MX_USART1_UART_Init(void) {
     if (HAL_UART_Init(&huart1) != HAL_OK) {
         Error_Handler();
     }
+    char * str = "uart1 was init sucess \n";
+//     HAL_UART_Transmit_DMA(&huart1, str, strlen(str));
+    sendStr(str);
     /* USER CODE BEGIN USART1_Init 2 */
 
     /* USER CODE END USART1_Init 2 */
@@ -149,6 +152,9 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *uartHandle) {
     }
 }
 
+RET sendStr(char *str) {
+   return HAL_UART_Transmit_DMA(&huart1, str, strlen(str));
+}
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
