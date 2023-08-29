@@ -1,0 +1,10 @@
+//
+// Created by ubuntu on 2023/8/29.
+//
+
+#ifndef MYSTM32PROJ_UART_HAL_CONF_H
+#define MYSTM32PROJ_UART_HAL_CONF_H
+extern UART_HandleTypeDef huart1;
+void MX_USART1_UART_Init(void);
+
+#endif //MYSTM32PROJ_UART_HAL_CONF_H
