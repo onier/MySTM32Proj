@@ -1,0 +1,28 @@
+1 包含锁的任务不推荐使用，目前是强制删除任务，可能会导致死锁局面，重启的任务也无法正常运行。
+2 过于频繁的任务也不推荐使用，会导致软件狗任务也要高频运行，浪费资源。
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+Task1 -> Task1:启动任务
+Soft_Watchdog_Task <- Task1: Register_Soft_WatchDog \n 注册任务信息到软件狗(任务函数，名称，优先级，超时时间等）
+
+Task1->Task1:开始进入循环任务列表处理
+
+Task1->Soft_Watchdog_Task:Reflesh_Soft_WatchDog刷新软件狗时间 \n开始刷新之后才是出发软件狗超时扫描 \n在这之前软件狗不会启动
+
+Soft_Watchdog_Task -> Soft_Watchdog_Task:启动软件狗定时任务，找到超时的任务，\n并执行销毁和重启任务的操作
+
+Task1->Task1:销毁
+
+Soft_Watchdog_Task -->Task1_1:创建新的镜像任务
+Task1_1 -> Task1_1:启动任务
+Task1_1 -> Soft_Watchdog_Task: Register_Soft_WatchDog \n 注册任务信息到软件狗(任务函数，名称，优先级，超时时间等）
+Task1_1->Task1_1:开始进入循环任务列表处理
+
+Task1_1->Soft_Watchdog_Task:Reflesh_Soft_WatchDog刷新软件狗时间 \n开始刷新之后才是出发软件狗超时扫描 \n在这之前软件狗不会启动
+
+Soft_Watchdog_Task -> Soft_Watchdog_Task:启动软件狗定时任务，找到超时的任务，\n并执行销毁和重启任务的操作
+
+Task1_1->Task1_1:销毁
+@enduml
