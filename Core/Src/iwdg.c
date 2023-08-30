@@ -59,7 +59,7 @@ static int getReload(int ms, int prescaler) {
 void IWDG_Task1(void *pvParameters) {
     while (1) {
         /* USER CODE END WHILE */
-        vTaskDelay(pdMS_TO_TICKS(1100));
+        vTaskDelay(pdMS_TO_TICKS(800));
         HAL_IWDG_Refresh(&hiwdg);
         uint8_t rxBuffer[] = "IWDG_Task1 Running \n";
         HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
@@ -69,7 +69,7 @@ void IWDG_Task1(void *pvParameters) {
 void IWDG_Task2(void *pvParameters) {
     while (1) {
         /* USER CODE END WHILE */
-        vTaskDelay(pdMS_TO_TICKS(1100));
+        vTaskDelay(pdMS_TO_TICKS(800));
         HAL_IWDG_Refresh(&hiwdg);
         uint8_t rxBuffer[] = "IWDG_Task2 Running \n";
         HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
@@ -97,7 +97,7 @@ void MX_IWDG_Init(void) {
     xTaskCreate(IWDG_Task2, "IWDG_Task2", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
 
     // 启动调度器
-    vTaskStartScheduler();
+//    vTaskStartScheduler();
 
 }
 

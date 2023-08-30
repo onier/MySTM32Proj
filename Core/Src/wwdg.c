@@ -74,21 +74,30 @@ static int get_window(int max_counter, int min_ms, int prescaler) {
 
 void WWDG_Task1(void *pvParameters) {
     while (1) {
+        int counter = 0;
         /* USER CODE END WHILE */
+        counter++;
         vTaskDelay(pdMS_TO_TICKS(20));
         HAL_WWDG_Refresh(&hwwdg);
-        uint8_t rxBuffer[] = "WWDG Task1 Running \n";
-        HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
+        if (counter == 50) {
+            uint8_t rxBuffer[] = "WWDG Task1 Running \n";
+            HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
+        }
     }
 }
 
 void WWDG_Task2(void *pvParameters) {
+    int counter = 0;
     while (1) {
         /* USER CODE END WHILE */
+        counter++;
         vTaskDelay(pdMS_TO_TICKS(28));
         HAL_WWDG_Refresh(&hwwdg);
-        uint8_t rxBuffer[] = "WWDG Task2 Running \n";
-        HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
+        if (counter == 50) {
+            counter = 0;
+            uint8_t rxBuffer[] = "WWDG Task2 Running \n";
+            HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
+        }
     }
 }
 
