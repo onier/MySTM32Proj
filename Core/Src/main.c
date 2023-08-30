@@ -23,6 +23,7 @@
 #include "usart.h"
 #include "wwdg.h"
 #include "gpio.h"
+#include "soft_watchdog.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -93,7 +94,8 @@ int main(void)
   MX_USART1_UART_Init();
 //  MX_IWDG_Init();
 //  MX_WWDG_Init();
-    enable_hardware_watchdog(10,5);
+//    Enable_Hardware_Watchdog(10, 5);
+  Enable_System_Soft_Watchdog(1000);
   /* USER CODE BEGIN 2 */
   /* USER CODE END 2 */
 

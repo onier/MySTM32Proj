@@ -67,8 +67,8 @@ void Hardware_Watchdog_Task(void *pvParameters) {
     }
 }
 
-void enable_hardware_watchdog(int timeout_second, int interval) {
-    interval_second = interval;
+void Enable_Hardware_Watchdog(int timeout_second, int interval) {
+    interval_second = interval_second;
     uint8_t rxBuffer[] = "hardware_watchdog starting \n";
     HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
     /* USER CODE BEGIN IWDG_Init 0 */
