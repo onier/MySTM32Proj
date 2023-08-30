@@ -91,8 +91,9 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
-  MX_IWDG_Init();
-  MX_WWDG_Init();
+//  MX_IWDG_Init();
+//  MX_WWDG_Init();
+    enable_hardware_watchdog(10,5);
   /* USER CODE BEGIN 2 */
   /* USER CODE END 2 */
 

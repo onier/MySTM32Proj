@@ -27,6 +27,7 @@
 /* USER CODE END 0 */
 
 IWDG_HandleTypeDef hiwdg;
+int interval_second;
 
 //固定的计算公式
 static int getReload(int ms, int prescaler) {
@@ -56,24 +57,35 @@ static int getReload(int ms, int prescaler) {
     return ms * 32000 / (4 * prescaler * 1000) - 1;
 }
 
-void IWDG_Task1(void *pvParameters) {
+void Hardware_Watchdog_Task(void *pvParameters) {
     while (1) {
         /* USER CODE END WHILE */
-        vTaskDelay(pdMS_TO_TICKS(800));
-        HAL_IWDG_Refresh(&hiwdg);
-        uint8_t rxBuffer[] = "IWDG_Task1 Running \n";
+        vTaskDelay(pdMS_TO_TICKS(interval_second * 1000));
+//        HAL_IWDG_Refresh(&hiwdg);
+        uint8_t rxBuffer[] = "Hardware_Watchdog_Task Running \n";
         HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
     }
 }
 
-void IWDG_Task2(void *pvParameters) {
-    while (1) {
-        /* USER CODE END WHILE */
-        vTaskDelay(pdMS_TO_TICKS(800));
-        HAL_IWDG_Refresh(&hiwdg);
-        uint8_t rxBuffer[] = "IWDG_Task2 Running \n";
-        HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
+void enable_hardware_watchdog(int timeout_second, int interval) {
+    interval_second = interval;
+    uint8_t rxBuffer[] = "hardware_watchdog starting \n";
+    HAL_UART_Transmit(&huart1, rxBuffer, sizeof(rxBuffer), 1000);
+    /* USER CODE BEGIN IWDG_Init 0 */
+
+    /* USER CODE END IWDG_Init 0 */
+
+    /* USER CODE BEGIN IWDG_Init 1 */
+
+    /* USER CODE END IWDG_Init 1 */
+    hiwdg.Instance = IWDG;
+    hiwdg.Init.Prescaler = IWDG_PRESCALER_256;
+    hiwdg.Init.Reload = getReload(timeout_second * 1000, IWDG_PRESCALER_64);
+    if (HAL_IWDG_Init(&hiwdg) != HAL_OK) {
+        Error_Handler();
     }
+    xTaskCreate(Hardware_Watchdog_Task, "Hardware_Watchdog_Task", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY,
+                NULL);
 }
 
 /* IWDG init function */
@@ -89,12 +101,12 @@ void MX_IWDG_Init(void) {
     /* USER CODE END IWDG_Init 1 */
     hiwdg.Instance = IWDG;
     hiwdg.Init.Prescaler = IWDG_PRESCALER_64;
-    hiwdg.Init.Reload = getReload(1000,IWDG_PRESCALER_64);//1s的超时时间，两个任务可以共享看门狗，刷新周期会累加。下面两个task分别2秒刷新看门狗会导致超时出现。2/2>=1
+    hiwdg.Init.Reload = getReload(1000, IWDG_PRESCALER_64);//1s的超时时间，两个任务可以共享看门狗，刷新周期会累加。下面两个task分别2秒刷新看门狗会导致超时出现。2/2>=1
     if (HAL_IWDG_Init(&hiwdg) != HAL_OK) {
         Error_Handler();
     }
-    xTaskCreate(IWDG_Task1, "IWDG_Task1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(IWDG_Task2, "IWDG_Task2", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+//    xTaskCreate(IWDG_Task1, "IWDG_Task1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+//    xTaskCreate(IWDG_Task2, "IWDG_Task2", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
 
     // 启动调度器
 //    vTaskStartScheduler();

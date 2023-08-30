@@ -40,6 +40,7 @@ extern IWDG_HandleTypeDef hiwdg;
 
 void MX_IWDG_Init(void);
 
+void enable_hardware_watchdog(int timeout_second,int interval_second);
 /* USER CODE BEGIN Prototypes */
 
 /* USER CODE END Prototypes */
